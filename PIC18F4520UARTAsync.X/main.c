@@ -1,16 +1,10 @@
-/*
- * File:   main.c
- * Author: c13321
- *
- * Created on August 20, 2018, 1:39 PM
- */
 
 // PIC18F4520 Configuration Bit Settings
 
 // 'C' source line config statements
 
 // CONFIG1H
-#pragma config OSC = INTIO67    // Oscillator Selection bits (Internal oscillator block, port function on RA6 and RA7)
+#pragma config OSC = XT         // Oscillator Selection bits (XT oscillator)
 #pragma config FCMEN = OFF      // Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor disabled)
 #pragma config IESO = OFF       // Internal/External Oscillator Switchover bit (Oscillator Switchover mode disabled)
 
@@ -69,10 +63,60 @@
 
 #include <xc.h>
 
+#define _XTAL_FREQ 8000000
+char receiveFlag=0;
+char data=0;
+
 void main(void) {
     
+    TRISD=0x00;
     
-    while(1);
+    LATD=0x0F;
+    
+    //set tris pins for UART tx/rx
+    TRISCbits.RC7=1; //RX
+    TRISCbits.RC6=1; //TX
+    
+    //Low speed Baud rate21
+    //Asynchronous mode
+    TXSTA=0x00;
+    
+    //Serial port enable bit
+    RCSTA=0x80;
+    
+    BAUDCON=0x00;
+    
+    //load Baud rate
+    SPBRG=12;
+    
+    //start transmission
+    TXSTAbits.TXEN=1;
+    //enable reception
+    RCSTAbits.CREN=1;
+    
+    while(1){
+       
+        //wait for data to receive
+        while(PIR1bits.RCIF){
+            
+            data=RCREG;
+            LATD=data;
+            receiveFlag=1;
+            
+        }
+      
+        if(receiveFlag==1){
+            
+            //wait for transmission to end
+            while(!TXSTAbits.TRMT);
+    
+            //load data
+            TXREG=data;
+           
+            receiveFlag=0;
+        }
+       
+    }
     
     return;
 }
