@@ -65,13 +65,9 @@
 
 #define _XTAL_FREQ 8000000
 char receiveFlag=0;
-char data=0;
+char myData=0;
 
 void main(void) {
-    
-    TRISD=0x00;
-    
-    LATD=0x0F;
     
     //set tris pins for UART tx/rx
     TRISCbits.RC7=1; //RX
@@ -86,34 +82,41 @@ void main(void) {
     
     BAUDCON=0x00;
     
-    //load Baud rate
+    //load Baud rate. Using a 8MHz crystal and a desired baud rate of 9600, corresponds to a value of SPBRG of 12.
     SPBRG=12;
     
     //start transmission
     TXSTAbits.TXEN=1;
+    
     //enable reception
     RCSTAbits.CREN=1;
     
     while(1){
        
-        //wait for data to receive
+        //wait for data to be received
         while(PIR1bits.RCIF){
             
-            data=RCREG;
-            LATD=data;
+            //load the data in the RCGEG into data
+            myData=RCREG;
+            
+            //set the receive flag
             receiveFlag=1;
             
         }
       
+        //if data was received, then transmit it back.
+        
         if(receiveFlag==1){
+            
+            //get the data received, add one to it, and load it into the TXREG to transmit.
+            TXREG=myData+1;
             
             //wait for transmission to end
             while(!TXSTAbits.TRMT);
-    
-            //load data
-            TXREG=data+1;
-           
+            
+            //clear the receive flag
             receiveFlag=0;
+            
         }
        
     }
