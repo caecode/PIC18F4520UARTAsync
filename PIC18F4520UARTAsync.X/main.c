@@ -70,34 +70,33 @@ char myData=0;
 
 void main(void) {
     
-    //set tris pins for UART tx/rx
+    //Line 1. set tris pins for UART tx/rx
     TRISCbits.RC7=1; //RX
     TRISCbits.RC6=1; //TX
     
-    //Low speed Baud rate21
-    //Asynchronous mode
+    //Line 2. Asynchronous mode
     TXSTA=0x00;
     
-    //Serial port enable bit
+    //Line 3. Serial port enable bit
     RCSTA=0x80;
     
     BAUDCON=0x00;
     
-    //load Baud rate. Using a 8MHz crystal and a desired baud rate of 9600, corresponds to a value of SPBRG of 12.
+    //Line 4. load Baud rate. Using a 8MHz crystal and a desired baud rate of 9600, corresponds to a value of SPBRG of 12.
     SPBRG=12;
     
-    //start transmission
+    //Line 5. start transmission
     TXSTAbits.TXEN=1;
     
-    //enable reception
+    //Line 6. enable reception
     RCSTAbits.CREN=1;
     
     while(1){
        
-        //wait for data to be received
+        //Line 7. wait for data to be received
         while(PIR1bits.RCIF){
             
-            //load the data in the RCGEG into data
+            //Line 8. load the data in the RCGEG into data
             myData=RCREG;
             
             //set the receive flag
@@ -106,13 +105,12 @@ void main(void) {
         }
       
         //if data was received, then transmit it back.
-        
         if(receiveFlag==1){
             
-            //get the data received, add one to it, and load it into the TXREG to transmit.
+            //Line 9. get the data received, add one to it, and load it into the TXREG to transmit.
             TXREG=myData+1;
             
-            //wait for transmission to end
+            //Line 10. wait for transmission to end
             while(!TXSTAbits.TRMT);
             
             //clear the receive flag
