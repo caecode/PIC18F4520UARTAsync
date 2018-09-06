@@ -111,7 +111,7 @@ void main(void) {
             while(!TXSTAbits.TRMT);
     
             //load data
-            TXREG=data;
+            TXREG=data+1;
            
             receiveFlag=0;
         }
