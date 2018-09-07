@@ -74,11 +74,11 @@ void main(void) {
     TRISCbits.RC7=1; //RX
     TRISCbits.RC6=1; //TX
     
-    //Line 2. Asynchronous mode
-    TXSTA=0x00;
+    //Line 2. Serial port enable bit
+    RCSTAbits.SPEN=1;
     
-    //Line 3. Serial port enable bit
-    RCSTA=0x80;
+    //Line 3. Asynchronous mode
+    TXSTAbits.SYNC=0;
     
     BAUDCON=0x00;
     
